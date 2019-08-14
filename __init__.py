@@ -13,17 +13,18 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.entity_component import EntityComponent
 
+from . import const
 
-__version__ = '1.1.1'
+
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=300)
-DOMAIN = 'ourgroceries'
+
 
 CONFIG_SCHEMA = vol.Schema({
-    DOMAIN: vol.Schema({
+    const.DOMAIN: vol.Schema({
         vol.Required(CONF_USERNAME): cv.string,
         vol.Required(CONF_PASSWORD): cv.string
-    })
+    }),
 }, extra=vol.ALLOW_EXTRA)
 
 
@@ -31,8 +32,8 @@ async def async_setup(hass, config):
     """Add API for interacting with Our Groceries."""
 
     _LOGGER.debug('creating og instance')
-    conf = config[DOMAIN]
-    hass.data[DOMAIN] = og = OurGroceries(
+    conf = config[const.DOMAIN]
+    hass.data[const.DOMAIN] = og = OurGroceries(
         username=conf.get(CONF_USERNAME),
         password=conf.get(CONF_PASSWORD))
 
@@ -40,7 +41,7 @@ async def async_setup(hass, config):
     await og.login()
 
     _LOGGER.debug('setting up sensor')
-    hass.async_create_task(async_load_platform(hass, 'sensor', DOMAIN, {}, config))
+    hass.async_create_task(async_load_platform(hass, 'sensor', const.DOMAIN, {}, config))
 
     hass.http.register_view(OurGroceriesView(og))
     _LOGGER.debug('registered view')

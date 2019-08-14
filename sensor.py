@@ -1,11 +1,13 @@
 """Support for Our Groceries."""
 import logging
 
-from . import DOMAIN
 from homeassistant.helpers.entity import Entity
+
+from .const import DOMAIN, VERSION, NAME_LONG, PROJECT_URL
 
 
 _LOGGER = logging.getLogger(__name__)
+
 
 ATTR_RECIPES = 'recipes'
 ATTR_SHOPPING_LISTS = 'shopping_lists'
@@ -25,6 +27,13 @@ class OurGroceriesSensor(Entity):
         """Initialize the sensor."""
         self._og = og
         self._lists = []
+
+    @property
+    def unique_id(self):
+        """Return a unique ID to use for this sensor."""
+        return (
+            "07g5g-74gc-48fd-9b16-c854365f-fd42-4a5vv8-a072-adeh4544cd"
+        )
 
     @property
     def name(self):
@@ -55,4 +64,13 @@ class OurGroceriesSensor(Entity):
         """Update data from API."""
         _LOGGER.debug('updating og state')
         self._lists = await self._og.get_my_lists()
+    
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self.unique_id)},
+            "name": NAME_LONG,
+            "sw_version": VERSION,
+            "manufacturer": PROJECT_URL,
+        }
 
